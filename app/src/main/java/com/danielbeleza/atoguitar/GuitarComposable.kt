@@ -11,6 +11,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.layout.layout
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -25,7 +27,7 @@ fun GuitarStringsLayout(chord: Chord) {
         Box(
             modifier = Modifier
                 .clip(RectangleShape)
-                .fillMaxWidth(0.7f)
+                .fillMaxWidth(0.55f)
                 .wrapContentHeight()
                 .clip(RoundedCornerShape(8.dp))
                 .background(Color.LightGray),
@@ -76,8 +78,9 @@ fun GuitarStringsLayout(chord: Chord) {
                             }
                             Row(
                                 modifier = Modifier
-                                    .fillMaxWidth(),
-                                horizontalArrangement = Arrangement.SpaceEvenly
+                                    .fillMaxWidth()
+                                    .padding(horizontal = 16.dp),
+                                horizontalArrangement = Arrangement.SpaceBetween
                             ) {
                                 fret.forEach { stringNote -> // single string
                                     val chordNote: Int? = chord.firstOrNull { it.second == stringNote }?.first
@@ -93,24 +96,15 @@ fun GuitarStringsLayout(chord: Chord) {
 }
 
 @Composable
-fun NoteShapeIndicator(note: String) {
-    Box(
-        modifier = Modifier
-            .clip(CircleShape),
-        contentAlignment = Alignment.Center
-    ) {
-        Text(note)
-    }
-}
-
-@Composable
 @Preview
 fun ChordsLettersRow() {
     Row(
         modifier = Modifier
-            .fillMaxWidth(),
-        horizontalArrangement = Arrangement.SpaceEvenly
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp),
+        horizontalArrangement = Arrangement.SpaceBetween
     ) {
+        // Guitar chords: E, A, D, G, B, E
         Text(text = "E")
         Text(text = "A")
         Text(text = "D")
@@ -124,14 +118,55 @@ fun ChordsLettersRow() {
 fun GuitarFretString(fingerNumber: Int?, height: Dp) {
     Box(
         modifier = Modifier
-            .height(height = height)
-            .width(2.dp)
-            .background(Color.Red),
+            .wrapContentHeight()
+            .width(24.dp),
         contentAlignment = Alignment.Center
     ) {
+        Box(
+            modifier = Modifier
+                .height(height = height)
+                .width(2.dp)
+                .background(Color.Red)
+        )
+
         fingerNumber?.let {
-            Text(text = it.toString())
+            NoteShapeIndicator(note = it)
+
         }
+    }
+}
+
+@Composable
+fun NoteShapeIndicator(note: Int) {
+
+    Box(
+        modifier = Modifier
+            .wrapContentWidth()
+            .background(color = Color.White, shape = CircleShape)
+            .wrapContentHeight()
+            .layout { measurable, constraints ->
+                // Measure the composable
+                val placeable = measurable.measure(constraints)
+
+                // get the current max dimension to assign width=height
+                val currentHeight = placeable.height
+                var heightCircle = currentHeight
+                if (placeable.width > heightCircle)
+                    heightCircle = placeable.width
+
+                // assign the dimension and the center position
+                layout(heightCircle, heightCircle) {
+                    // Where the composable gets placed
+                    placeable.placeRelative(placeable.width / 2, (heightCircle - currentHeight) / 2)
+                }
+            },
+        contentAlignment = Alignment.Center
+    ) {
+        Text(
+            text = note.toString(),
+            modifier = Modifier
+                .padding(1.dp)
+        )
     }
 }
 
