@@ -1,0 +1,2 @@
+rootProject.name = "AToGuitar"
+include ':app'
