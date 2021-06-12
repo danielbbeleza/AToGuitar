@@ -11,7 +11,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
-import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.layout
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
@@ -44,11 +43,11 @@ fun GuitarStringsLayout(chord: Chord) {
 
 //                val notes = intArrayOf(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30)
                 val notes = arrayOf(
-                    intArrayOf(1, 2, 3, 4, 5, 6),
-                    intArrayOf(7, 8, 9, 10, 11, 12),
-                    intArrayOf(13, 14, 15, 16, 17, 18),
-                    intArrayOf(19, 20, 21, 22, 23, 24),
-                    intArrayOf(25, 26, 27, 28, 29, 30)
+                    intArrayOf(0, 1, 2, 3, 4, 5),
+                    intArrayOf(6, 7, 8, 9, 10, 11),
+                    intArrayOf(12, 13, 14, 15, 16, 17),
+                    intArrayOf(18, 19, 20, 21, 22, 23),
+                    intArrayOf(24, 25, 26, 27, 28, 29)
                 ).toList()
 
                 // Initial line after the chords letters
@@ -82,9 +81,25 @@ fun GuitarStringsLayout(chord: Chord) {
                                     .padding(horizontal = 16.dp),
                                 horizontalArrangement = Arrangement.SpaceBetween
                             ) {
-                                fret.forEach { stringNote -> // single string
-                                    val chordNote: Int? = chord.firstOrNull { it.second == stringNote }?.first
-                                    GuitarFretString(chordNote, height)
+                                fret.forEachIndexed { fretIndex, stringNote ->  // single guitar string
+                                    val fingerPosition: FingerPosition? = chord.firstOrNull { it.stringFretPosition == stringNote }
+                                    val fingerNumber: Int? = fingerPosition?.fingerNumber
+                                    val barreLastFingerPosition: FingerPosition? = chord.firstOrNull { it.barreLastStringPosition == stringNote }
+
+                                    val barreLastFingerStringPosition = barreLastFingerPosition?.barreLastStringPosition
+                                    val isBarreLastPosition = fretIndex == fret.lastIndex
+
+                                    val noteIndicatorType: NoteIndicatorType = when {
+                                        isBarreLastPosition && barreLastFingerStringPosition != null -> NoteIndicatorType.LastFingerPosition(barreLastFingerStringPosition)
+                                        isBarreLastPosition.not() && barreLastFingerStringPosition != null -> NoteIndicatorType.Ligature
+                                        fingerNumber != null -> NoteIndicatorType.PrimaryFingerPosition(fingerNumber)
+                                        barreLastFingerStringPosition != null && chord.any { it.barreLastStringPosition == stringNote } -> NoteIndicatorType.PrimaryFingerPositionWithLigature(barreLastFingerStringPosition)
+                                        else -> {
+//                                            throw IllegalStateException("Unknown use case")
+                                            NoteIndicatorType.None
+                                        }
+                                    }
+                                    GuitarFretString(noteIndicatorType = noteIndicatorType, height)
                                 }
                             }
                         }
@@ -115,7 +130,7 @@ fun ChordsLettersRow() {
 }
 
 @Composable
-fun GuitarFretString(fingerNumber: Int?, height: Dp) {
+fun GuitarFretString(noteIndicatorType: NoteIndicatorType, height: Dp) {
     Box(
         modifier = Modifier
             .wrapContentHeight()
@@ -129,16 +144,36 @@ fun GuitarFretString(fingerNumber: Int?, height: Dp) {
                 .background(Color.Red)
         )
 
-        fingerNumber?.let {
-            NoteShapeIndicator(note = it)
-
+        when (noteIndicatorType) {
+            is NoteIndicatorType.PrimaryFingerPosition -> NoteShapeIndicator(note = noteIndicatorType.fingerNumber)
+            is NoteIndicatorType.PrimaryFingerPositionWithLigature -> NoteShapeIndicator(note = noteIndicatorType.fingerNumber, noteIndicatureLigatureType = NoteIndicatorLigatureType.START)
+            is NoteIndicatorType.LastFingerPosition -> NoteShapeIndicator(note = noteIndicatorType.fingerNumber, noteIndicatureLigatureType = NoteIndicatorLigatureType.END)
+            NoteIndicatorType.Ligature -> BarreLigature()
         }
     }
 }
 
 @Composable
-fun NoteShapeIndicator(note: Int) {
+fun NoteShapeIndicatorLigature() {
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(4.dp)
+            .background(Color.White)
+    )
+}
 
+@Composable
+fun BarreLigature() {
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(6.dp)
+    )
+}
+
+@Composable
+fun NoteShapeIndicator(note: Int, noteIndicatureLigatureType: NoteIndicatorLigatureType? = null) {
     Box(
         modifier = Modifier
             .wrapContentWidth()
