@@ -82,9 +82,9 @@ fun GuitarStringsLayout(chord: Chord) {
                                 horizontalArrangement = Arrangement.SpaceBetween
                             ) {
                                 fret.forEachIndexed { fretIndex, stringNote ->  // single guitar string
-                                    val fingerPosition: FingerPosition? = chord.firstOrNull { it.stringFretPosition == stringNote }
+                                    val fingerPosition: FingerPosition? = chord.fingerPositions.firstOrNull { it.stringFretPosition == stringNote }
                                     val fingerNumber: Int? = fingerPosition?.fingerNumber
-                                    val barreLastFingerPosition: FingerPosition? = chord.firstOrNull { it.barreLastStringPosition == stringNote }
+                                    val barreLastFingerPosition: FingerPosition? = chord.fingerPositions.firstOrNull { it.barreLastStringPosition == stringNote }
 
                                     val barreLastFingerStringPosition = barreLastFingerPosition?.barreLastStringPosition
                                     val isBarreLastPosition = fretIndex == fret.lastIndex
@@ -93,9 +93,8 @@ fun GuitarStringsLayout(chord: Chord) {
                                         isBarreLastPosition && barreLastFingerStringPosition != null -> NoteIndicatorType.LastFingerPosition(barreLastFingerStringPosition)
                                         isBarreLastPosition.not() && barreLastFingerStringPosition != null -> NoteIndicatorType.Ligature
                                         fingerNumber != null -> NoteIndicatorType.PrimaryFingerPosition(fingerNumber)
-                                        barreLastFingerStringPosition != null && chord.any { it.barreLastStringPosition == stringNote } -> NoteIndicatorType.PrimaryFingerPositionWithLigature(barreLastFingerStringPosition)
+                                        barreLastFingerStringPosition != null && chord.fingerPositions.any { it.barreLastStringPosition == stringNote } -> NoteIndicatorType.PrimaryFingerPositionWithLigature(barreLastFingerStringPosition)
                                         else -> {
-//                                            throw IllegalStateException("Unknown use case")
                                             NoteIndicatorType.None
                                         }
                                     }

@@ -1,9 +1,6 @@
 package com.danielbeleza.atoguitar
 
-typealias Chord = List<FingerPosition>
-
-typealias FingerNumber = Int
-typealias Note = Int
+data class Chord(val fingerPositions: List<FingerPosition>)
 
 data class FingerPosition(
     val fingerNumber: Int,
