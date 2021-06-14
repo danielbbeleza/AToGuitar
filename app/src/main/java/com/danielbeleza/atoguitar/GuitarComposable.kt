@@ -41,7 +41,6 @@ fun GuitarStringsLayout(chord: Chord) {
 
                 Spacer(modifier = Modifier.height(8.dp))
 
-//                val notes = intArrayOf(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30)
                 val notes = arrayOf(
                     intArrayOf(0, 1, 2, 3, 4, 5),
                     intArrayOf(6, 7, 8, 9, 10, 11),
@@ -81,17 +80,26 @@ fun GuitarStringsLayout(chord: Chord) {
                                     .padding(horizontal = 16.dp),
                                 horizontalArrangement = Arrangement.SpaceBetween
                             ) {
+                                var drawLigature = false
+                                // Loop through each fret's row
+                                // each element will be a note in the guitar. Validate comparing it with the given chord, if these match then do something accordingly
                                 fret.forEachIndexed { fretIndex, stringNote ->  // single guitar string
                                     val fingerPosition: FingerPosition? = chord.fingerPositions.firstOrNull { it.stringFretPosition == stringNote }
                                     val fingerNumber: Int? = fingerPosition?.fingerNumber
-                                    val barreLastFingerPosition: FingerPosition? = chord.fingerPositions.firstOrNull { it.barreLastStringPosition == stringNote }
+                                    val ligature: LigaturePosition? = chord.fingerPositions.firstOrNull { it.ligaturePosition?.ligatureFretPosition == stringNote }
 
-                                    val barreLastFingerStringPosition = barreLastFingerPosition?.barreLastStringPosition
+//                                    val barreLastFingerStringPosition = barreLastFingerPosition?.barreLastStringPosition
                                     val isBarreLastPosition = fretIndex == fret.lastIndex
+
+//                                    if (barreLastFingerPosition != null && isBarreLastPosition) {
+//                                        drawLigature = false
+//                                    } else if (barreLastFingerPosition != null && isBarreLastPosition.not()) {
+//                                        drawLigature = true
+//                                    }
 
                                     val noteIndicatorType: NoteIndicatorType = when {
                                         isBarreLastPosition && barreLastFingerStringPosition != null -> NoteIndicatorType.LastFingerPosition(barreLastFingerStringPosition)
-                                        isBarreLastPosition.not() && barreLastFingerStringPosition != null -> NoteIndicatorType.Ligature
+                                        drawLigature -> NoteIndicatorType.Ligature
                                         fingerNumber != null -> NoteIndicatorType.PrimaryFingerPosition(fingerNumber)
                                         barreLastFingerStringPosition != null && chord.fingerPositions.any { it.barreLastStringPosition == stringNote } -> NoteIndicatorType.PrimaryFingerPositionWithLigature(barreLastFingerStringPosition)
                                         else -> {
@@ -168,6 +176,7 @@ fun BarreLigature() {
         modifier = Modifier
             .fillMaxWidth()
             .height(6.dp)
+            .background(Color.White)
     )
 }
 

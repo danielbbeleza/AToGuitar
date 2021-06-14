@@ -21,7 +21,7 @@ object ChordFactory {
                 )
             }
             else -> {
-                throw IllegalStateException("Unkown")
+                throw IllegalStateException("Unknown")
             }
         }
     }
