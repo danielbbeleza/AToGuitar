@@ -5,7 +5,13 @@ data class Chord(val fingerPositions: List<FingerPosition>)
 data class FingerPosition(
     val fingerNumber: Int,
     val stringFretPosition: Int,
-    val barreLastStringPosition: Int? = null
+    val stringFretFirstBarrePosition: Int? = null,
+    val stringFretLastPosition: Int? = null
+)
+
+data class LigaturePosition(
+    val ligatureFretPosition: Int,
+    val ligatureLastFretPosition: Int
 )
 
 sealed class NoteIndicatorType {

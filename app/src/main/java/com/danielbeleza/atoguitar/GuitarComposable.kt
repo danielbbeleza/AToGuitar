@@ -1,5 +1,6 @@
 package com.danielbeleza.atoguitar
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
@@ -41,7 +42,6 @@ fun GuitarStringsLayout(chord: Chord) {
 
                 Spacer(modifier = Modifier.height(8.dp))
 
-//                val notes = intArrayOf(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30)
                 val notes = arrayOf(
                     intArrayOf(0, 1, 2, 3, 4, 5),
                     intArrayOf(6, 7, 8, 9, 10, 11),
@@ -81,23 +81,53 @@ fun GuitarStringsLayout(chord: Chord) {
                                     .padding(horizontal = 16.dp),
                                 horizontalArrangement = Arrangement.SpaceBetween
                             ) {
-                                fret.forEachIndexed { fretIndex, stringNote ->  // single guitar string
-                                    val fingerPosition: FingerPosition? = chord.fingerPositions.firstOrNull { it.stringFretPosition == stringNote }
-                                    val fingerNumber: Int? = fingerPosition?.fingerNumber
-                                    val barreLastFingerPosition: FingerPosition? = chord.fingerPositions.firstOrNull { it.barreLastStringPosition == stringNote }
+                                // Loop through each fret's row
+                                // each element will be a note in the guitar. Validate comparing it with the given chord, if these match then do something accordingly
 
-                                    val barreLastFingerStringPosition = barreLastFingerPosition?.barreLastStringPosition
-                                    val isBarreLastPosition = fretIndex == fret.lastIndex
+                                fret.forEachIndexed { fretStringIndex, stringNote ->  // single guitar string
+                                    lateinit var noteIndicatorType: NoteIndicatorType
+                                    fingerPositionLoop@ for (fingerPosition in chord.fingerPositions) {
+//                                        chord.fingerPositions.forEachIndexed fingerPositions@{ index, fingerPosition ->
+                                        if (fingerPosition.stringFretLastPosition != null && fingerPosition.stringFretFirstBarrePosition != null) {
+                                            Log.i("GuitarComposable", "Is barre")
+//                                            if (fingerPosition.stringFretPosition == fretStringIndex) {
+                                            if (fingerPosition.stringFretFirstBarrePosition == stringNote && fingerPosition.stringFretPosition == fingerPosition.stringFretFirstBarrePosition) {
+                                                Log.i("GuitarComposable", "Init ligature")
+                                                // Init ligature
+                                                noteIndicatorType = NoteIndicatorType.PrimaryFingerPositionWithLigature(fingerPosition.fingerNumber)
+                                                break@fingerPositionLoop
+                                            } else if (fingerPosition.stringFretFirstBarrePosition != fingerPosition.stringFretPosition
+                                                && fingerPosition.stringFretPosition == stringNote
+                                                && fingerPosition.stringFretLastPosition != fingerPosition.stringFretPosition
+                                            ) {
+                                                Log.i("GuitarComposable", "Mid ligature")
+                                                // Is mid ligature
+                                                noteIndicatorType = NoteIndicatorType.Ligature
+                                                break@fingerPositionLoop
+                                            } else if (fingerPosition.stringFretPosition == stringNote
+                                                && fingerPosition.stringFretPosition == fingerPosition.stringFretLastPosition
+                                            ) {
+                                                // Is last ligature
+                                                Log.i("GuitarComposable", "Last ligature")
+                                                noteIndicatorType = NoteIndicatorType.LastFingerPosition(fingerPosition.fingerNumber)
+                                                break@fingerPositionLoop
+                                            } else {
+                                                Log.i("GuitarComposable", "Unknown ligature")
+                                                noteIndicatorType = NoteIndicatorType.None
+                                            }
+                                        } else {
+                                            Log.i("GuitarComposable", "Is not barre")
+                                            val fingerPositionEqualToNote: FingerPosition? = chord.fingerPositions.firstOrNull { it.stringFretPosition == stringNote }
+                                            val fingerNumber: Int? = fingerPositionEqualToNote?.fingerNumber
 
-                                    val noteIndicatorType: NoteIndicatorType = when {
-                                        isBarreLastPosition && barreLastFingerStringPosition != null -> NoteIndicatorType.LastFingerPosition(barreLastFingerStringPosition)
-                                        isBarreLastPosition.not() && barreLastFingerStringPosition != null -> NoteIndicatorType.Ligature
-                                        fingerNumber != null -> NoteIndicatorType.PrimaryFingerPosition(fingerNumber)
-                                        barreLastFingerStringPosition != null && chord.fingerPositions.any { it.barreLastStringPosition == stringNote } -> NoteIndicatorType.PrimaryFingerPositionWithLigature(barreLastFingerStringPosition)
-                                        else -> {
-                                            NoteIndicatorType.None
+                                            noteIndicatorType = if (fingerNumber != null) {
+                                                NoteIndicatorType.PrimaryFingerPosition(fingerNumber)
+                                            } else {
+                                                NoteIndicatorType.None
+                                            }
                                         }
                                     }
+                                    Log.i("GuitarComposable", "Guitar Composable: $noteIndicatorType")
                                     GuitarFretString(noteIndicatorType = noteIndicatorType, height)
                                 }
                             }
@@ -133,7 +163,7 @@ fun GuitarFretString(noteIndicatorType: NoteIndicatorType, height: Dp) {
     Box(
         modifier = Modifier
             .wrapContentHeight()
-            .width(24.dp),
+            .width(30.dp),
         contentAlignment = Alignment.Center
     ) {
         Box(
@@ -145,22 +175,13 @@ fun GuitarFretString(noteIndicatorType: NoteIndicatorType, height: Dp) {
 
         when (noteIndicatorType) {
             is NoteIndicatorType.PrimaryFingerPosition -> NoteShapeIndicator(note = noteIndicatorType.fingerNumber)
-            is NoteIndicatorType.PrimaryFingerPositionWithLigature -> NoteShapeIndicator(note = noteIndicatorType.fingerNumber, noteIndicatureLigatureType = NoteIndicatorLigatureType.START)
-            is NoteIndicatorType.LastFingerPosition -> NoteShapeIndicator(note = noteIndicatorType.fingerNumber, noteIndicatureLigatureType = NoteIndicatorLigatureType.END)
+            is NoteIndicatorType.PrimaryFingerPositionWithLigature -> NoteShapeIndicator(note = noteIndicatorType.fingerNumber)
+            is NoteIndicatorType.LastFingerPosition -> NoteShapeIndicator(note = noteIndicatorType.fingerNumber)
             NoteIndicatorType.Ligature -> BarreLigature()
         }
     }
 }
 
-@Composable
-fun NoteShapeIndicatorLigature() {
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(4.dp)
-            .background(Color.White)
-    )
-}
 
 @Composable
 fun BarreLigature() {
@@ -168,11 +189,12 @@ fun BarreLigature() {
         modifier = Modifier
             .fillMaxWidth()
             .height(6.dp)
+            .background(Color.White)
     )
 }
 
 @Composable
-fun NoteShapeIndicator(note: Int, noteIndicatureLigatureType: NoteIndicatorLigatureType? = null) {
+fun NoteShapeIndicator(note: Int) {
     Box(
         modifier = Modifier
             .wrapContentWidth()
@@ -201,6 +223,30 @@ fun NoteShapeIndicator(note: Int, noteIndicatureLigatureType: NoteIndicatorLigat
             modifier = Modifier
                 .padding(1.dp)
         )
+//        when (noteIndicatureLigatureType) {
+//            NoteIndicatorLigatureType.START -> {
+//                Box(
+//                    modifier = Modifier
+//                        .width(12.dp)
+//                        .height(8.dp)
+//                        .background(Color.White)
+//                )
+//            }
+//            NoteIndicatorLigatureType.END -> {
+//                Box(
+//                    modifier = Modifier
+//                        .width(12.dp)
+//                        .height(8.dp)
+//                        .background(Color.White)
+//                        .layout { measurable, constraints ->
+//                            val placeable = measurable.measure(constraints)
+//                            layout(12, 8) {
+//                                placeable.placeRelative(12, 0)
+//                            }
+//                        }
+//                )
+//            }
+//        }
     }
 }
 
