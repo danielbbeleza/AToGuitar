@@ -1,2 +1,3 @@
 rootProject.name = "AToGuitar"
 include ':app'
+include ':demo'
