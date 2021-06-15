@@ -5,7 +5,8 @@ data class Chord(val fingerPositions: List<FingerPosition>)
 data class FingerPosition(
     val fingerNumber: Int,
     val stringFretPosition: Int,
-    val ligaturePosition: LigaturePosition? = null
+    val stringFretFirstBarrePosition: Int? = null,
+    val stringFretLastPosition: Int? = null
 )
 
 data class LigaturePosition(

@@ -14,7 +14,11 @@ object ChordFactory {
             }
             ChordLetter.B_MAJOR.toKey() -> {
                 buildChord(
-                    FingerPosition(fingerNumber = 1, stringFretPosition = 7, barreLastStringPosition = 11),
+                    FingerPosition(fingerNumber = 1, stringFretPosition = 7, stringFretFirstBarrePosition = 7, stringFretLastPosition = 11),
+                    FingerPosition(fingerNumber = 1, stringFretPosition = 8, stringFretFirstBarrePosition = 7, stringFretLastPosition = 11),
+                    FingerPosition(fingerNumber = 1, stringFretPosition = 9, stringFretFirstBarrePosition = 7, stringFretLastPosition = 11),
+                    FingerPosition(fingerNumber = 1, stringFretPosition = 10, stringFretFirstBarrePosition = 7, stringFretLastPosition = 11),
+                    FingerPosition(fingerNumber = 1, stringFretPosition = 11, stringFretFirstBarrePosition = 7, stringFretLastPosition = 11),
                     FingerPosition(fingerNumber = 2, stringFretPosition = 20),
                     FingerPosition(fingerNumber = 3, stringFretPosition = 21),
                     FingerPosition(fingerNumber = 4, stringFretPosition = 22)
