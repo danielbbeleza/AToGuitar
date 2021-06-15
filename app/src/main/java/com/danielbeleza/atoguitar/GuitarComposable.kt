@@ -163,7 +163,7 @@ fun GuitarFretString(noteIndicatorType: NoteIndicatorType, height: Dp) {
     Box(
         modifier = Modifier
             .wrapContentHeight()
-            .width(24.dp),
+            .width(30.dp),
         contentAlignment = Alignment.Center
     ) {
         Box(
@@ -175,22 +175,13 @@ fun GuitarFretString(noteIndicatorType: NoteIndicatorType, height: Dp) {
 
         when (noteIndicatorType) {
             is NoteIndicatorType.PrimaryFingerPosition -> NoteShapeIndicator(note = noteIndicatorType.fingerNumber)
-            is NoteIndicatorType.PrimaryFingerPositionWithLigature -> NoteShapeIndicator(note = noteIndicatorType.fingerNumber, noteIndicatureLigatureType = NoteIndicatorLigatureType.START)
-            is NoteIndicatorType.LastFingerPosition -> NoteShapeIndicator(note = noteIndicatorType.fingerNumber, noteIndicatureLigatureType = NoteIndicatorLigatureType.END)
+            is NoteIndicatorType.PrimaryFingerPositionWithLigature -> NoteShapeIndicator(note = noteIndicatorType.fingerNumber)
+            is NoteIndicatorType.LastFingerPosition -> NoteShapeIndicator(note = noteIndicatorType.fingerNumber)
             NoteIndicatorType.Ligature -> BarreLigature()
         }
     }
 }
 
-@Composable
-fun NoteShapeIndicatorLigature() {
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(4.dp)
-            .background(Color.White)
-    )
-}
 
 @Composable
 fun BarreLigature() {
@@ -203,7 +194,7 @@ fun BarreLigature() {
 }
 
 @Composable
-fun NoteShapeIndicator(note: Int, noteIndicatureLigatureType: NoteIndicatorLigatureType? = null) {
+fun NoteShapeIndicator(note: Int) {
     Box(
         modifier = Modifier
             .wrapContentWidth()
@@ -232,6 +223,30 @@ fun NoteShapeIndicator(note: Int, noteIndicatureLigatureType: NoteIndicatorLigat
             modifier = Modifier
                 .padding(1.dp)
         )
+//        when (noteIndicatureLigatureType) {
+//            NoteIndicatorLigatureType.START -> {
+//                Box(
+//                    modifier = Modifier
+//                        .width(12.dp)
+//                        .height(8.dp)
+//                        .background(Color.White)
+//                )
+//            }
+//            NoteIndicatorLigatureType.END -> {
+//                Box(
+//                    modifier = Modifier
+//                        .width(12.dp)
+//                        .height(8.dp)
+//                        .background(Color.White)
+//                        .layout { measurable, constraints ->
+//                            val placeable = measurable.measure(constraints)
+//                            layout(12, 8) {
+//                                placeable.placeRelative(12, 0)
+//                            }
+//                        }
+//                )
+//            }
+//        }
     }
 }
 
