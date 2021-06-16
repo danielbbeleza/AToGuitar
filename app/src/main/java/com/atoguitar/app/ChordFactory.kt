@@ -1,4 +1,4 @@
-package com.danielbeleza.atoguitar
+package com.atoguitar.app
 
 object ChordFactory {
 

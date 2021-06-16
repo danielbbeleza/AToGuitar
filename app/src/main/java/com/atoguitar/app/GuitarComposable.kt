@@ -1,37 +1,65 @@
-package com.danielbeleza.atoguitar
+package com.atoguitar.app
 
 import android.util.Log
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.AlertDialog
+import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.graphics.ShaderBrush
 import androidx.compose.ui.layout.layout
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 
 @Composable
-fun GuitarStringsLayout(chord: Chord) {
+fun GuitarChordAlertDialog(chord: Chord, setShowDialog: (Boolean) -> Unit) {
+    // Layout
+    NonClickableBackground {
+        setShowDialog(it)
+    }
+    Box(
+        modifier = Modifier
+            .fillMaxSize(),
+        contentAlignment = Alignment.Center
+    ) {
+        GuitarChordLayout(chord = chord)
+    }
+}
+
+@Composable
+private fun NonClickableBackground(setShowDialog: (Boolean) -> Unit) {
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .clickable { setShowDialog(false) })
+}
+
+@Composable
+private fun GuitarChordLayout(chord: Chord) {
     Column(
-        modifier = Modifier.fillMaxSize(),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
+        modifier = Modifier
+            .wrapContentSize()
+            .clickable {},
+//        horizontalAlignment = Alignment.CenterHorizontally,
+//        verticalArrangement = Arrangement.Center
     ) {
         Box(
             modifier = Modifier
                 .clip(RectangleShape)
                 .fillMaxWidth(0.55f)
-                .wrapContentHeight()
                 .clip(RoundedCornerShape(8.dp))
                 .background(Color.LightGray),
-            contentAlignment = Alignment.BottomCenter
         ) {
             Column(
                 modifier = Modifier
@@ -68,7 +96,7 @@ fun GuitarStringsLayout(chord: Chord) {
                             val height = when (index) {
                                 0 -> 80.dp
                                 1 -> 80.dp
-                                2 -> 80.dp
+                                2 -> 64.dp
                                 3 -> 64.dp
                                 else -> 48.dp
                             }
@@ -139,9 +167,54 @@ fun GuitarStringsLayout(chord: Chord) {
     }
 }
 
+private fun getNoteIndicatorType(chord: Chord, stringNote: Int): NoteIndicatorType {
+    lateinit var noteIndicatorType: NoteIndicatorType
+    fingerPositionLoop@ for (fingerPosition in chord.fingerPositions) {
+//                                        chord.fingerPositions.forEachIndexed fingerPositions@{ index, fingerPosition ->
+        if (fingerPosition.stringFretLastPosition != null && fingerPosition.stringFretFirstBarrePosition != null) {
+            Log.i("GuitarComposable", "Is barre")
+//                                            if (fingerPosition.stringFretPosition == fretStringIndex) {
+            if (fingerPosition.stringFretFirstBarrePosition == stringNote && fingerPosition.stringFretPosition == fingerPosition.stringFretFirstBarrePosition) {
+                Log.i("GuitarComposable", "Init ligature")
+                // Init ligature
+                noteIndicatorType = NoteIndicatorType.PrimaryFingerPositionWithLigature(fingerPosition.fingerNumber)
+                break@fingerPositionLoop
+            } else if (fingerPosition.stringFretFirstBarrePosition != fingerPosition.stringFretPosition
+                && fingerPosition.stringFretPosition == stringNote
+                && fingerPosition.stringFretLastPosition != fingerPosition.stringFretPosition
+            ) {
+                Log.i("GuitarComposable", "Mid ligature")
+                // Is mid ligature
+                noteIndicatorType = NoteIndicatorType.Ligature
+                break@fingerPositionLoop
+            } else if (fingerPosition.stringFretPosition == stringNote
+                && fingerPosition.stringFretPosition == fingerPosition.stringFretLastPosition
+            ) {
+                // Is last ligature
+                Log.i("GuitarComposable", "Last ligature")
+                noteIndicatorType = NoteIndicatorType.LastFingerPosition(fingerPosition.fingerNumber)
+                break@fingerPositionLoop
+            } else {
+                Log.i("GuitarComposable", "Unknown ligature")
+                noteIndicatorType = NoteIndicatorType.None
+            }
+        } else {
+            Log.i("GuitarComposable", "Is not barre")
+            val fingerPositionEqualToNote: FingerPosition? = chord.fingerPositions.firstOrNull { it.stringFretPosition == stringNote }
+            val fingerNumber: Int? = fingerPositionEqualToNote?.fingerNumber
+
+            noteIndicatorType = if (fingerNumber != null) {
+                NoteIndicatorType.PrimaryFingerPosition(fingerNumber)
+            } else {
+                NoteIndicatorType.None
+            }
+        }
+    }
+    return noteIndicatorType
+}
+
 @Composable
-@Preview
-fun ChordsLettersRow() {
+internal fun ChordsLettersRow() {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -159,7 +232,7 @@ fun ChordsLettersRow() {
 }
 
 @Composable
-fun GuitarFretString(noteIndicatorType: NoteIndicatorType, height: Dp) {
+internal fun GuitarFretString(noteIndicatorType: NoteIndicatorType, height: Dp) {
     Box(
         modifier = Modifier
             .wrapContentHeight()
@@ -184,7 +257,7 @@ fun GuitarFretString(noteIndicatorType: NoteIndicatorType, height: Dp) {
 
 
 @Composable
-fun BarreLigature() {
+internal fun BarreLigature() {
     Box(
         modifier = Modifier
             .fillMaxWidth()
@@ -194,7 +267,7 @@ fun BarreLigature() {
 }
 
 @Composable
-fun NoteShapeIndicator(note: Int) {
+internal fun NoteShapeIndicator(note: Int) {
     Box(
         modifier = Modifier
             .wrapContentWidth()
@@ -223,36 +296,12 @@ fun NoteShapeIndicator(note: Int) {
             modifier = Modifier
                 .padding(1.dp)
         )
-//        when (noteIndicatureLigatureType) {
-//            NoteIndicatorLigatureType.START -> {
-//                Box(
-//                    modifier = Modifier
-//                        .width(12.dp)
-//                        .height(8.dp)
-//                        .background(Color.White)
-//                )
-//            }
-//            NoteIndicatorLigatureType.END -> {
-//                Box(
-//                    modifier = Modifier
-//                        .width(12.dp)
-//                        .height(8.dp)
-//                        .background(Color.White)
-//                        .layout { measurable, constraints ->
-//                            val placeable = measurable.measure(constraints)
-//                            layout(12, 8) {
-//                                placeable.placeRelative(12, 0)
-//                            }
-//                        }
-//                )
-//            }
-//        }
     }
 }
 
 @Composable
 @Preview
-fun GuitarFrets() {
+internal fun GuitarFrets() {
     Column(
         modifier = Modifier.fillMaxSize(),
         verticalArrangement = Arrangement.SpaceEvenly
@@ -266,7 +315,7 @@ fun GuitarFrets() {
 
 @Composable
 @Preview
-fun GuitarFret() {
+internal fun GuitarFret() {
     Box(
         modifier = Modifier
             .clip(RectangleShape)

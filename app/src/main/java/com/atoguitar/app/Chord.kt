@@ -1,4 +1,4 @@
-package com.danielbeleza.atoguitar
+package com.atoguitar.app
 
 data class Chord(val fingerPositions: List<FingerPosition>)
 
@@ -20,9 +20,4 @@ sealed class NoteIndicatorType {
     data class LastFingerPosition(val fingerNumber: Int) : NoteIndicatorType()
     object Ligature : NoteIndicatorType()
     object None : NoteIndicatorType()
-}
-
-enum class NoteIndicatorLigatureType {
-    START,
-    END
 }
