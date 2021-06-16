@@ -20,7 +20,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.atoguitar.app.ChordFactory
 import com.atoguitar.app.ChordLetter
-import com.atoguitar.app.GuitarChordAlertDialog
+import com.atoguitar.app.GuitarChordDialog
 
 @ExperimentalFoundationApi
 @Composable
@@ -36,7 +36,7 @@ fun ChordsList(chordLetters: List<ChordLetter>) {
         }
     }
     if (showDialog) {
-        GuitarChordAlertDialog(
+        GuitarChordDialog(
             chord = ChordFactory.buildChordFromLetter(chordLetterClicked),
             setShowDialog = setShowDialog
         )

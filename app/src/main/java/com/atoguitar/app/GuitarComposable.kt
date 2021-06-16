@@ -23,7 +23,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 
 @Composable
-fun GuitarChordAlertDialog(chord: Chord, setShowDialog: (Boolean) -> Unit) {
+fun GuitarChordDialog(chord: Chord, setShowDialog: (Boolean) -> Unit) {
     // Layout
     NonClickableBackground {
         setShowDialog(it)

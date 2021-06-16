@@ -2,7 +2,7 @@ package com.atoguitar.app
 
 object ChordFactory {
 
-    fun buildChordFromLetter(chordLabel: String): Chord {
+    fun buildChordFromLetter(chordLabel: String = ""): Chord {
         ChordLetter.values().find { chordLabel == it.toKey() }
         return when (chordLabel) {
             ChordLetter.A_MAJOR.toKey() -> {
@@ -191,7 +191,7 @@ object ChordFactory {
                 )
             }
             else -> {
-                throw IllegalStateException("Unknown")
+                buildChord()
             }
         }
     }
