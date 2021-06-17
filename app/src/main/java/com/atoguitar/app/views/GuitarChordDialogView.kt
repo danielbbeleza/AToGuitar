@@ -20,7 +20,7 @@ class GuitarChordDialogView @JvmOverloads constructor(
 
     @Composable
     override fun Content() {
-        GuitarChordDialog(chord = chord) {
-        }
+//        GuitarChordDialog(chord = chord) {
+//        }
     }
 }

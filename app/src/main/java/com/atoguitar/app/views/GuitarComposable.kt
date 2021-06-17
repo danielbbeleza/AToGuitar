@@ -6,21 +6,26 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.layout.layout
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.*
 import com.atoguitar.app.*
 
 @Composable
-fun GuitarChordDialog(chord: Chord, setShowDialog: (Boolean) -> Unit) {
+fun GuitarChordDialog(
+    chord: Chord,
+    setShowDialog: (Boolean) -> Unit,
+    showChordLetter: Boolean,
+    setShowChordLetterRow: (Boolean) -> Unit
+) {
     // Layout
     NonClickableBackground {
         setShowDialog(it)
@@ -30,7 +35,9 @@ fun GuitarChordDialog(chord: Chord, setShowDialog: (Boolean) -> Unit) {
             .fillMaxSize(),
         contentAlignment = Alignment.Center
     ) {
-        GuitarChordLayout(chord = chord)
+        GuitarChordLayout(chord = chord, showChordLetter = showChordLetter) {
+            setShowChordLetterRow(it)
+        }
     }
 }
 
@@ -43,7 +50,8 @@ private fun NonClickableBackground(setShowDialog: (Boolean) -> Unit) {
 }
 
 @Composable
-private fun GuitarChordLayout(chord: Chord) {
+private fun GuitarChordLayout(chord: Chord, showChordLetter: Boolean, setShowChordLetterRow: (Boolean) -> Unit) {
+
     Column(
         modifier = Modifier
             .wrapContentSize()
@@ -61,10 +69,15 @@ private fun GuitarChordLayout(chord: Chord) {
                     .wrapContentHeight()
                     .padding(top = 8.dp)
             ) {
-                val playableStrings = ChordFactory.buildPlayableStringsSymbols(chord.chord)
-                ChordsLettersRow(playableStrings)
 
-                Spacer(modifier = Modifier.height(margin_x2))
+                ChordLetterRow(chordLetter = chord.chordLetter)
+                Spacer(modifier = Modifier.height(margin_x1))
+
+                AboveFretRow(
+                    chord = chord,
+                    showChordLetter = showChordLetter,
+                    setShowChordLetterRow = setShowChordLetterRow
+                )
 
                 val notes = arrayOf(
                     intArrayOf(0, 1, 2, 3, 4, 5),
@@ -93,16 +106,16 @@ private fun GuitarChordLayout(chord: Chord) {
                                 GuitarFret()
                             }
                             val height = when (index) {
-                                0 -> fret_height_2
-                                1 -> fret_height_2
-                                2 -> fret_height_3
-                                3 -> fret_height_3
+                                0 -> fret_height_1
+                                1 -> fret_height_1
+                                2 -> fret_height_2
+                                3 -> fret_height_2
                                 else -> fret_height_3
                             }
                             Row(
                                 modifier = Modifier
                                     .fillMaxWidth()
-                                    .padding(horizontal = margin_x4),
+                                    .padding(horizontal = margin_x2),
                                 horizontalArrangement = Arrangement.SpaceBetween
                             ) {
                                 // Loop through each fret's row
@@ -167,32 +180,91 @@ private fun getNoteIndicatorType(chord: Chord, stringNote: Int): NoteIndicatorTy
 }
 
 @Composable
-internal fun ChordsLettersRow(playableStrings: Map<Int, String>) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = margin_x7),
-        horizontalArrangement = Arrangement.SpaceBetween
-    ) {
-        // Guitar chords: E, A, D, G, B, E
-        Text(text = playableStrings[0].orEmpty())
-        Text(text = playableStrings[1].orEmpty())
-        Text(text = playableStrings[2].orEmpty())
-        Text(text = playableStrings[3].orEmpty())
-        Text(text = playableStrings[4].orEmpty())
-        Text(text = playableStrings[5].orEmpty())
-
-//        Text(text = ChordLetter.E_MAJOR.toKey())
-//        Text(text = ChordLetter.A_MAJOR.toKey())
-//        Text(text = ChordLetter.D_MAJOR.toKey())
-//        Text(text = ChordLetter.G_MAJOR.toKey())
-//        Text(text = ChordLetter.B_MAJOR.toKey())
-//        Text(text = ChordLetter.E_MAJOR.toKey())
+private fun AboveFretRow(
+    chord: Chord,
+    showChordLetter: Boolean,
+    setShowChordLetterRow: (Boolean) -> Unit
+) {
+    Box(modifier = Modifier.height(32.dp)) {
+        if (showChordLetter) {
+            ChordsLettersRow(setShowChordLetterRow = setShowChordLetterRow)
+        } else {
+            val playableStrings = ChordFactory.buildPlayableStringsSymbols(chord.chordLetter)
+            PlayableStringsRow(playableStrings = playableStrings, setShowChordLetterRow = setShowChordLetterRow)
+        }
+        Spacer(modifier = Modifier.height(margin_x1))
     }
 }
 
 @Composable
-internal fun GuitarFretString(noteIndicatorType: NoteIndicatorType, height: Dp) {
+private fun ChordLetterRow(chordLetter: ChordLetter) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = margin_x7),
+        horizontalArrangement = Arrangement.Center
+    ) {
+        Text(
+            text = chordLetter.toKey(),
+            fontWeight = FontWeight.Bold,
+            fontSize = 16.sp
+        )
+    }
+}
+
+@Composable
+private fun PlayableStringsRow(playableStrings: Map<Int, String>, setShowChordLetterRow: (Boolean) -> Unit) {
+    MaterialTheme {
+        Box(
+            modifier = Modifier
+                .height(54.dp)
+                .clickable { setShowChordLetterRow(true) },
+            contentAlignment = Alignment.Center
+        ) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = margin_x5),
+                horizontalArrangement = Arrangement.SpaceBetween,
+            ) {
+                val stringsNo = 6
+                repeat(stringsNo) {
+                    Text(text = playableStrings[it] ?: " ", fontSize = 24.sp)
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun ChordsLettersRow(setShowChordLetterRow: (Boolean) -> Unit) {
+    MaterialTheme {
+        Box(
+            modifier = Modifier
+                .height(54.dp)
+                .clickable { setShowChordLetterRow(false) },
+            contentAlignment = Alignment.Center
+        ) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = margin_x5),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                // Guitar chords: E, A, D, G, B, E
+                Text(text = ChordLetter.E_MAJOR.toKey())
+                Text(text = ChordLetter.A_MAJOR.toKey())
+                Text(text = ChordLetter.D_MAJOR.toKey())
+                Text(text = ChordLetter.G_MAJOR.toKey())
+                Text(text = ChordLetter.B_MAJOR.toKey())
+                Text(text = ChordLetter.E_MAJOR.toKey())
+            }
+        }
+    }
+}
+
+@Composable
+private fun GuitarFretString(noteIndicatorType: NoteIndicatorType, height: Dp) {
     Box(
         modifier = Modifier
             .wrapContentHeight()
@@ -217,7 +289,7 @@ internal fun GuitarFretString(noteIndicatorType: NoteIndicatorType, height: Dp) 
 
 
 @Composable
-internal fun BarreLigature() {
+private fun BarreLigature() {
     Box(
         modifier = Modifier
             .fillMaxWidth()
@@ -227,7 +299,7 @@ internal fun BarreLigature() {
 }
 
 @Composable
-internal fun NoteShapeIndicator(note: Int) {
+private fun NoteShapeIndicator(note: Int) {
     Box(
         modifier = Modifier
             .wrapContentSize()
@@ -260,7 +332,7 @@ internal fun NoteShapeIndicator(note: Int) {
 
 @Composable
 @Preview
-internal fun GuitarFrets() {
+private fun GuitarFrets() {
     Column(
         modifier = Modifier.fillMaxSize(),
         verticalArrangement = Arrangement.SpaceEvenly
@@ -274,7 +346,7 @@ internal fun GuitarFrets() {
 
 @Composable
 @Preview
-internal fun GuitarFret() {
+private fun GuitarFret() {
     Box(
         modifier = Modifier
             .clip(RectangleShape)

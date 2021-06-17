@@ -325,7 +325,7 @@ object ChordFactory {
     }
 
     private const val PLAYABLE_STRING_SYMBOL = "○"
-    private const val NOT_PLAYABLE_STRING_SYMBOL = "x"
+    private const val NOT_PLAYABLE_STRING_SYMBOL = "×"
 }
 
 enum class ChordLetter(private val chordLabel: String) {

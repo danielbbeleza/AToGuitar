@@ -27,6 +27,8 @@ import com.atoguitar.app.views.GuitarChordDialog
 fun ChordsList(chordLetters: List<ChordLetter>) {
     val (showDialog, setShowDialog) = remember { mutableStateOf(false) }
     val (chordLetterClicked, setChordLetterClicked) = remember { mutableStateOf(ChordLetter.NONE) }
+    val (showChordLetterRow, setShowChordLetterRow) = remember { mutableStateOf(true) }
+
     LazyVerticalGrid(cells = GridCells.Fixed(count = 4)) {
         items(chordLetters) { chordLetter ->
             ChordCell(chordLetter) {
@@ -38,7 +40,9 @@ fun ChordsList(chordLetters: List<ChordLetter>) {
     if (showDialog) {
         GuitarChordDialog(
             chord = ChordFactory.buildChordFromLetter(chordLetterClicked),
-            setShowDialog = setShowDialog
+            setShowDialog = setShowDialog,
+            showChordLetter = showChordLetterRow,
+            setShowChordLetterRow = setShowChordLetterRow
         )
     }
 }
