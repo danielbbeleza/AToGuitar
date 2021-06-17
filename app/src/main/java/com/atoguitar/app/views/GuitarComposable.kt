@@ -61,7 +61,8 @@ private fun GuitarChordLayout(chord: Chord) {
                     .wrapContentHeight()
                     .padding(top = 8.dp)
             ) {
-                ChordsLettersRow()
+                val playableStrings = ChordFactory.buildPlayableStringsSymbols(chord.chord)
+                ChordsLettersRow(playableStrings)
 
                 Spacer(modifier = Modifier.height(margin_x2))
 
@@ -166,7 +167,7 @@ private fun getNoteIndicatorType(chord: Chord, stringNote: Int): NoteIndicatorTy
 }
 
 @Composable
-internal fun ChordsLettersRow() {
+internal fun ChordsLettersRow(playableStrings: Map<Int, String>) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -174,12 +175,19 @@ internal fun ChordsLettersRow() {
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
         // Guitar chords: E, A, D, G, B, E
-        Text(text = ChordLetter.E_MAJOR.toKey())
-        Text(text = ChordLetter.A_MAJOR.toKey())
-        Text(text = ChordLetter.D_MAJOR.toKey())
-        Text(text = ChordLetter.G_MAJOR.toKey())
-        Text(text = ChordLetter.B_MAJOR.toKey())
-        Text(text = ChordLetter.E_MAJOR.toKey())
+        Text(text = playableStrings[0].orEmpty())
+        Text(text = playableStrings[1].orEmpty())
+        Text(text = playableStrings[2].orEmpty())
+        Text(text = playableStrings[3].orEmpty())
+        Text(text = playableStrings[4].orEmpty())
+        Text(text = playableStrings[5].orEmpty())
+
+//        Text(text = ChordLetter.E_MAJOR.toKey())
+//        Text(text = ChordLetter.A_MAJOR.toKey())
+//        Text(text = ChordLetter.D_MAJOR.toKey())
+//        Text(text = ChordLetter.G_MAJOR.toKey())
+//        Text(text = ChordLetter.B_MAJOR.toKey())
+//        Text(text = ChordLetter.E_MAJOR.toKey())
     }
 }
 

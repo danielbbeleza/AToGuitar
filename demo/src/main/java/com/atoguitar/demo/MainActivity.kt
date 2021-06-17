@@ -3,7 +3,7 @@ package com.atoguitar.demo
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.ExperimentalFoundationApi import com.atoguitar.app.ChordFactory
+import androidx.compose.foundation.ExperimentalFoundationApi
 import com.atoguitar.app.ChordLetter
 
 @ExperimentalFoundationApi
@@ -14,7 +14,10 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             ChordsList(
-                chordLetters = ChordLetter.values().toList()
+                chordLetters = ChordLetter
+                    .values()
+                    .toList()
+                    .filterNot { it == ChordLetter.NONE }
             )
         }
     }

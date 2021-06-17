@@ -7,6 +7,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.AbstractComposeView
+import com.atoguitar.app.Chord
 import com.atoguitar.app.ChordFactory
 
 class GuitarChordDialogView @JvmOverloads constructor(
@@ -15,7 +16,7 @@ class GuitarChordDialogView @JvmOverloads constructor(
     defStyle: Int = 0
 ) : AbstractComposeView(context, attrs, defStyle) {
 
-    var chord by mutableStateOf(ChordFactory.buildChordFromLetter())
+    var chord by mutableStateOf<Chord>(ChordFactory.buildChordFromLetter())
 
     @Composable
     override fun Content() {

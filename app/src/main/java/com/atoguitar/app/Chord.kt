@@ -1,6 +1,6 @@
 package com.atoguitar.app
 
-data class Chord(val fingerPositions: List<FingerPosition>)
+data class Chord(val chord: ChordLetter, val fingerPositions: List<FingerPosition>)
 
 data class FingerPosition(
     val fingerNumber: Int,

@@ -26,12 +26,12 @@ import com.atoguitar.app.views.GuitarChordDialog
 @Composable
 fun ChordsList(chordLetters: List<ChordLetter>) {
     val (showDialog, setShowDialog) = remember { mutableStateOf(false) }
-    val (chordLetterClicked, setChordLetterClicked) = remember { mutableStateOf("A") }
+    val (chordLetterClicked, setChordLetterClicked) = remember { mutableStateOf(ChordLetter.NONE) }
     LazyVerticalGrid(cells = GridCells.Fixed(count = 4)) {
         items(chordLetters) { chordLetter ->
             ChordCell(chordLetter) {
                 setShowDialog(it)
-                setChordLetterClicked(chordLetter.toKey())
+                setChordLetterClicked(chordLetter)
             }
         }
     }
