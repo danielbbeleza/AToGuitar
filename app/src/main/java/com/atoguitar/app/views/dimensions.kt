@@ -9,6 +9,7 @@ val margin_x3 = 12.dp
 val margin_x4 = 16.dp
 val margin_x5 = 20.dp
 val margin_x6 = 24.dp
+val margin_x7 = 28.dp
 val margin_x8 = 32.dp
 
 val letter_chord_divider_height = margin_x05

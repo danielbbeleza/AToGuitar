@@ -92,10 +92,10 @@ private fun GuitarChordLayout(chord: Chord) {
                                 GuitarFret()
                             }
                             val height = when (index) {
-                                0 -> fret_height_1
-                                1 -> fret_height_1
-                                2 -> fret_height_2
-                                3 -> fret_height_2
+                                0 -> fret_height_2
+                                1 -> fret_height_2
+                                2 -> fret_height_3
+                                3 -> fret_height_3
                                 else -> fret_height_3
                             }
                             Row(
@@ -170,7 +170,7 @@ internal fun ChordsLettersRow() {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = margin_x4),
+            .padding(horizontal = margin_x7),
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
         // Guitar chords: E, A, D, G, B, E
