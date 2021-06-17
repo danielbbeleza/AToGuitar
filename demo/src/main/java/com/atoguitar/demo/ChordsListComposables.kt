@@ -1,8 +1,7 @@
 package com.atoguitar.demo
 
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.GridCells
 import androidx.compose.foundation.lazy.LazyVerticalGrid
 import androidx.compose.foundation.lazy.items
@@ -51,10 +50,12 @@ fun ChordsList(chordLetters: List<ChordLetter>) {
 fun ChordCell(chordLetter: ChordLetter, onClick: (Boolean) -> Unit) {
     Box(
         modifier = Modifier
-            .height(72.dp),
+            .wrapContentSize()
+            .padding(horizontal = 8.dp, vertical = 8.dp),
         contentAlignment = Alignment.Center
     ) {
-        Button(onClick = {
+        Button(modifier = Modifier
+            .height(56.dp), onClick = {
             onClick(true)
         }) {
             Text(
