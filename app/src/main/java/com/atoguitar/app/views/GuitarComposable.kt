@@ -1,4 +1,4 @@
-package com.atoguitar.app
+package com.atoguitar.app.views
 
 import android.util.Log
 import androidx.compose.foundation.background
@@ -6,21 +6,18 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.AlertDialog
-import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
-import androidx.compose.ui.graphics.ShaderBrush
 import androidx.compose.ui.layout.layout
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import com.atoguitar.app.*
 
 @Composable
 fun GuitarChordDialog(chord: Chord, setShowDialog: (Boolean) -> Unit) {
@@ -50,16 +47,14 @@ private fun GuitarChordLayout(chord: Chord) {
     Column(
         modifier = Modifier
             .wrapContentSize()
-            .clickable {},
-//        horizontalAlignment = Alignment.CenterHorizontally,
-//        verticalArrangement = Arrangement.Center
+            .clickable {}
     ) {
         Box(
             modifier = Modifier
                 .clip(RectangleShape)
                 .fillMaxWidth(0.55f)
-                .clip(RoundedCornerShape(8.dp))
-                .background(Color.LightGray),
+                .clip(RoundedCornerShape(margin_x2))
+                .background(ColorBackground),
         ) {
             Column(
                 modifier = Modifier
@@ -68,7 +63,7 @@ private fun GuitarChordLayout(chord: Chord) {
             ) {
                 ChordsLettersRow()
 
-                Spacer(modifier = Modifier.height(8.dp))
+                Spacer(modifier = Modifier.height(margin_x2))
 
                 val notes = arrayOf(
                     intArrayOf(0, 1, 2, 3, 4, 5),
@@ -82,8 +77,8 @@ private fun GuitarChordLayout(chord: Chord) {
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(2.dp)
-                        .background(Color.Gray)
+                        .height(letter_chord_divider_height)
+                        .background(ColorSecondaryOnBackground)
                 )
 
                 Box(
@@ -92,69 +87,27 @@ private fun GuitarChordLayout(chord: Chord) {
                         .wrapContentHeight()
                 ) {
                     Column(Modifier.wrapContentHeight()) {
-                        notes.forEachIndexed { index, fret -> // fret of strings
-                            val height = when (index) {
-                                0 -> 80.dp
-                                1 -> 80.dp
-                                2 -> 64.dp
-                                3 -> 64.dp
-                                else -> 48.dp
-                            }
+                        for ((index, fret) in notes.withIndex()) {
                             if (index > 0) {
                                 GuitarFret()
+                            }
+                            val height = when (index) {
+                                0 -> fret_height_1
+                                1 -> fret_height_1
+                                2 -> fret_height_2
+                                3 -> fret_height_2
+                                else -> fret_height_3
                             }
                             Row(
                                 modifier = Modifier
                                     .fillMaxWidth()
-                                    .padding(horizontal = 16.dp),
+                                    .padding(horizontal = margin_x4),
                                 horizontalArrangement = Arrangement.SpaceBetween
                             ) {
                                 // Loop through each fret's row
                                 // each element will be a note in the guitar. Validate comparing it with the given chord, if these match then do something accordingly
-
-                                fret.forEachIndexed { fretStringIndex, stringNote ->  // single guitar string
-                                    lateinit var noteIndicatorType: NoteIndicatorType
-                                    fingerPositionLoop@ for (fingerPosition in chord.fingerPositions) {
-//                                        chord.fingerPositions.forEachIndexed fingerPositions@{ index, fingerPosition ->
-                                        if (fingerPosition.stringFretLastPosition != null && fingerPosition.stringFretFirstBarrePosition != null) {
-                                            Log.i("GuitarComposable", "Is barre")
-//                                            if (fingerPosition.stringFretPosition == fretStringIndex) {
-                                            if (fingerPosition.stringFretFirstBarrePosition == stringNote && fingerPosition.stringFretPosition == fingerPosition.stringFretFirstBarrePosition) {
-                                                Log.i("GuitarComposable", "Init ligature")
-                                                // Init ligature
-                                                noteIndicatorType = NoteIndicatorType.PrimaryFingerPositionWithLigature(fingerPosition.fingerNumber)
-                                                break@fingerPositionLoop
-                                            } else if (fingerPosition.stringFretFirstBarrePosition != fingerPosition.stringFretPosition
-                                                && fingerPosition.stringFretPosition == stringNote
-                                                && fingerPosition.stringFretLastPosition != fingerPosition.stringFretPosition
-                                            ) {
-                                                Log.i("GuitarComposable", "Mid ligature")
-                                                // Is mid ligature
-                                                noteIndicatorType = NoteIndicatorType.Ligature
-                                                break@fingerPositionLoop
-                                            } else if (fingerPosition.stringFretPosition == stringNote
-                                                && fingerPosition.stringFretPosition == fingerPosition.stringFretLastPosition
-                                            ) {
-                                                // Is last ligature
-                                                Log.i("GuitarComposable", "Last ligature")
-                                                noteIndicatorType = NoteIndicatorType.LastFingerPosition(fingerPosition.fingerNumber)
-                                                break@fingerPositionLoop
-                                            } else {
-                                                Log.i("GuitarComposable", "Unknown ligature")
-                                                noteIndicatorType = NoteIndicatorType.None
-                                            }
-                                        } else {
-                                            Log.i("GuitarComposable", "Is not barre")
-                                            val fingerPositionEqualToNote: FingerPosition? = chord.fingerPositions.firstOrNull { it.stringFretPosition == stringNote }
-                                            val fingerNumber: Int? = fingerPositionEqualToNote?.fingerNumber
-
-                                            noteIndicatorType = if (fingerNumber != null) {
-                                                NoteIndicatorType.PrimaryFingerPosition(fingerNumber)
-                                            } else {
-                                                NoteIndicatorType.None
-                                            }
-                                        }
-                                    }
+                                fret.forEach { stringNote ->  // single guitar string
+                                    val noteIndicatorType = getNoteIndicatorType(chord, stringNote)
                                     Log.i("GuitarComposable", "Guitar Composable: $noteIndicatorType")
                                     GuitarFretString(noteIndicatorType = noteIndicatorType, height)
                                 }
@@ -170,10 +123,8 @@ private fun GuitarChordLayout(chord: Chord) {
 private fun getNoteIndicatorType(chord: Chord, stringNote: Int): NoteIndicatorType {
     lateinit var noteIndicatorType: NoteIndicatorType
     fingerPositionLoop@ for (fingerPosition in chord.fingerPositions) {
-//                                        chord.fingerPositions.forEachIndexed fingerPositions@{ index, fingerPosition ->
         if (fingerPosition.stringFretLastPosition != null && fingerPosition.stringFretFirstBarrePosition != null) {
             Log.i("GuitarComposable", "Is barre")
-//                                            if (fingerPosition.stringFretPosition == fretStringIndex) {
             if (fingerPosition.stringFretFirstBarrePosition == stringNote && fingerPosition.stringFretPosition == fingerPosition.stringFretFirstBarrePosition) {
                 Log.i("GuitarComposable", "Init ligature")
                 // Init ligature
@@ -200,7 +151,8 @@ private fun getNoteIndicatorType(chord: Chord, stringNote: Int): NoteIndicatorTy
             }
         } else {
             Log.i("GuitarComposable", "Is not barre")
-            val fingerPositionEqualToNote: FingerPosition? = chord.fingerPositions.firstOrNull { it.stringFretPosition == stringNote }
+            val fingerPositionEqualToNote: FingerPosition? =
+                chord.fingerPositions.firstOrNull { it.stringFretPosition == stringNote }
             val fingerNumber: Int? = fingerPositionEqualToNote?.fingerNumber
 
             noteIndicatorType = if (fingerNumber != null) {
@@ -218,16 +170,16 @@ internal fun ChordsLettersRow() {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 16.dp),
+            .padding(horizontal = margin_x4),
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
         // Guitar chords: E, A, D, G, B, E
-        Text(text = "E")
-        Text(text = "A")
-        Text(text = "D")
-        Text(text = "G")
-        Text(text = "B")
-        Text(text = "E")
+        Text(text = ChordLetter.E_MAJOR.toKey())
+        Text(text = ChordLetter.A_MAJOR.toKey())
+        Text(text = ChordLetter.D_MAJOR.toKey())
+        Text(text = ChordLetter.G_MAJOR.toKey())
+        Text(text = ChordLetter.B_MAJOR.toKey())
+        Text(text = ChordLetter.E_MAJOR.toKey())
     }
 }
 
@@ -236,14 +188,14 @@ internal fun GuitarFretString(noteIndicatorType: NoteIndicatorType, height: Dp) 
     Box(
         modifier = Modifier
             .wrapContentHeight()
-            .width(30.dp),
+            .width(string_fret_width),
         contentAlignment = Alignment.Center
     ) {
         Box(
             modifier = Modifier
                 .height(height = height)
-                .width(2.dp)
-                .background(Color.Red)
+                .width(margin_x05)
+                .background(ColorSecondary)
         )
 
         when (noteIndicatorType) {
@@ -261,8 +213,8 @@ internal fun BarreLigature() {
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .height(6.dp)
-            .background(Color.White)
+            .height(ligature_barre_height)
+            .background(White)
     )
 }
 
@@ -270,9 +222,8 @@ internal fun BarreLigature() {
 internal fun NoteShapeIndicator(note: Int) {
     Box(
         modifier = Modifier
-            .wrapContentWidth()
-            .background(color = Color.White, shape = CircleShape)
-            .wrapContentHeight()
+            .wrapContentSize()
+            .background(color = White, shape = CircleShape)
             .layout { measurable, constraints ->
                 // Measure the composable
                 val placeable = measurable.measure(constraints)
@@ -320,7 +271,7 @@ internal fun GuitarFret() {
         modifier = Modifier
             .clip(RectangleShape)
             .fillMaxWidth()
-            .height(2.dp)
-            .background(Color.Black)
+            .height(fret_line_height)
+            .background(Black)
     )
 }

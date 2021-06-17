@@ -1,4 +1,4 @@
-package com.atoguitar.app
+package com.atoguitar.app.views
 
 import android.content.Context
 import android.util.AttributeSet
@@ -7,6 +7,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.AbstractComposeView
+import com.atoguitar.app.ChordFactory
 
 class GuitarChordDialogView @JvmOverloads constructor(
     context: Context,

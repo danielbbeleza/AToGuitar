@@ -20,7 +20,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.atoguitar.app.ChordFactory
 import com.atoguitar.app.ChordLetter
-import com.atoguitar.app.GuitarChordDialog
+import com.atoguitar.app.views.GuitarChordDialog
 
 @ExperimentalFoundationApi
 @Composable

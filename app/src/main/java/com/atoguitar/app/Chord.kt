@@ -9,11 +9,6 @@ data class FingerPosition(
     val stringFretLastPosition: Int? = null
 )
 
-data class LigaturePosition(
-    val ligatureFretPosition: Int,
-    val ligatureLastFretPosition: Int
-)
-
 sealed class NoteIndicatorType {
     data class PrimaryFingerPosition(val fingerNumber: Int) : NoteIndicatorType()
     data class PrimaryFingerPositionWithLigature(val fingerNumber: Int) : NoteIndicatorType()
