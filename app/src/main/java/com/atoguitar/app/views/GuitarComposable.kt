@@ -1,6 +1,7 @@
 package com.atoguitar.app.views
 
 import android.util.Log
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -16,6 +17,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.layout.layout
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.*
 import com.atoguitar.app.*
@@ -80,7 +82,7 @@ private fun GuitarChordLayout(
                 ChordLetterRow(chordLetter = chord.chordLetter)
                 Spacer(modifier = Modifier.height(margin_x1))
 
-                AboveFretRow(
+                TabFretRow(
                     chord = chord,
                     showChordLetter = showChordLetter,
                     setShowChordLetterRow = setShowChordLetterRow
@@ -113,26 +115,50 @@ private fun GuitarChordLayout(
                                 GuitarFret()
                             }
                             val height = when (index) {
-                                0 -> fret_height_1
-                                1 -> fret_height_1
+                                0 -> fret_height_2
+                                1 -> fret_height_2
                                 2 -> fret_height_2
-                                3 -> fret_height_2
+                                3 -> fret_height_3
                                 else -> fret_height_3
                             }
-                            Row(
+
+                            Box(
                                 modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(horizontal = margin_x2),
-                                horizontalArrangement = Arrangement.SpaceBetween
+                                    .fillMaxWidth(),
+                                contentAlignment = Alignment.Center
                             ) {
-                                // Loop through each fret's row
-                                // each element will be a note in the guitar. Validate comparing it with the given chord, if these match then do something accordingly
-                                fret.forEach { stringNote ->  // single guitar string
-                                    val noteIndicatorType = getNoteIndicatorType(chord, stringNote)
-                                    Log.i("GuitarComposable", "Guitar Composable: $noteIndicatorType")
-                                    GuitarFretString(noteIndicatorType = noteIndicatorType, height, fingerPositionBackgroundColor = fingerPositionBackgroundColor)
+                                if (index == 2) {
+                                    Column(
+                                        modifier = Modifier
+                                            .padding(horizontal = margin_x2),
+                                        horizontalAlignment = Alignment.CenterHorizontally
+                                    ) {
+                                        Canvas(
+                                            modifier = Modifier
+                                                .wrapContentSize()
+                                        ) {
+                                            drawCircle(
+                                                color = Grey,
+                                                radius = 32f
+                                            )
+                                        }
+                                    }
+                                }
+                                Row(
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+
+
+                                    // Loop through each fret's row
+                                    // each element will be a note in the guitar. Validate comparing it with the given chord, if these match then do something accordingly
+                                    fret.forEach { stringNote ->  // single guitar string
+                                        val noteIndicatorType = getNoteIndicatorType(chord, stringNote)
+                                        Log.i("GuitarComposable", "Guitar Composable: $noteIndicatorType")
+                                        GuitarFretString(noteIndicatorType = noteIndicatorType, height, fingerPositionBackgroundColor = fingerPositionBackgroundColor)
+                                    }
                                 }
                             }
+
                         }
                     }
                 }
@@ -187,7 +213,7 @@ private fun getNoteIndicatorType(chord: Chord, stringNote: Int): NoteIndicatorTy
 }
 
 @Composable
-private fun AboveFretRow(
+private fun TabFretRow(
     chord: Chord,
     showChordLetter: Boolean,
     setShowChordLetterRow: (Boolean) -> Unit
@@ -307,35 +333,21 @@ private fun BarreLigature() {
 
 @Composable
 private fun NoteShapeIndicator(note: Int, backgroundColor: Color) {
-    Box(
+    Text(
+        text = note.toString(),
+        textAlign = TextAlign.Center,
+        color = Color.White,
         modifier = Modifier
-            .wrapContentSize()
             .background(color = backgroundColor, shape = CircleShape)
+            .fillMaxWidth(0.85f)
             .layout { measurable, constraints ->
-                // Measure the composable
                 val placeable = measurable.measure(constraints)
-
-                // get the current max dimension to assign width=height
-                val currentHeight = placeable.height
-                var heightCircle = currentHeight
-                if (placeable.width > heightCircle)
-                    heightCircle = placeable.width
-
-                // assign the dimension and the center position
-                layout(heightCircle, heightCircle) {
-                    // Where the composable gets placed
-                    placeable.placeRelative(placeable.width / 2, (heightCircle - currentHeight) / 2)
+                layout(width = placeable.measuredWidth, height = placeable.measuredWidth) {
+                    val circleCenteredCoordinateVertically = (placeable.measuredWidth - placeable.height) / 2
+                    placeable.placeRelative(x = 0, y = circleCenteredCoordinateVertically)
                 }
-            },
-        contentAlignment = Alignment.Center
-    ) {
-        Text(
-            text = note.toString(),
-            color = Color.White,
-            modifier = Modifier
-                .padding(1.dp)
-        )
-    }
+            }
+    )
 }
 
 @Composable
