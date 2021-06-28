@@ -12,6 +12,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.layout.layout
 import androidx.compose.ui.text.font.FontWeight
@@ -24,7 +25,8 @@ fun GuitarChordDialog(
     chord: Chord,
     setShowDialog: (Boolean) -> Unit,
     showChordLetter: Boolean,
-    setShowChordLetterRow: (Boolean) -> Unit
+    setShowChordLetterRow: (Boolean) -> Unit,
+    fingerPositionBackgroundColor: Color = ColorPrimary
 ) {
     // Layout
     NonClickableBackground {
@@ -35,7 +37,7 @@ fun GuitarChordDialog(
             .fillMaxSize(),
         contentAlignment = Alignment.Center
     ) {
-        GuitarChordLayout(chord = chord, showChordLetter = showChordLetter) {
+        GuitarChordLayout(chord = chord, showChordLetter = showChordLetter, fingerPositionBackgroundColor = fingerPositionBackgroundColor) {
             setShowChordLetterRow(it)
         }
     }
@@ -50,7 +52,12 @@ private fun NonClickableBackground(setShowDialog: (Boolean) -> Unit) {
 }
 
 @Composable
-private fun GuitarChordLayout(chord: Chord, showChordLetter: Boolean, setShowChordLetterRow: (Boolean) -> Unit) {
+private fun GuitarChordLayout(
+    chord: Chord,
+    fingerPositionBackgroundColor: Color,
+    showChordLetter: Boolean,
+    setShowChordLetterRow: (Boolean) -> Unit
+) {
 
     Column(
         modifier = Modifier
@@ -123,7 +130,7 @@ private fun GuitarChordLayout(chord: Chord, showChordLetter: Boolean, setShowCho
                                 fret.forEach { stringNote ->  // single guitar string
                                     val noteIndicatorType = getNoteIndicatorType(chord, stringNote)
                                     Log.i("GuitarComposable", "Guitar Composable: $noteIndicatorType")
-                                    GuitarFretString(noteIndicatorType = noteIndicatorType, height)
+                                    GuitarFretString(noteIndicatorType = noteIndicatorType, height, fingerPositionBackgroundColor = fingerPositionBackgroundColor)
                                 }
                             }
                         }
@@ -264,7 +271,7 @@ private fun ChordsLettersRow(setShowChordLetterRow: (Boolean) -> Unit) {
 }
 
 @Composable
-private fun GuitarFretString(noteIndicatorType: NoteIndicatorType, height: Dp) {
+private fun GuitarFretString(noteIndicatorType: NoteIndicatorType, height: Dp, fingerPositionBackgroundColor: Color) {
     Box(
         modifier = Modifier
             .wrapContentHeight()
@@ -279,9 +286,9 @@ private fun GuitarFretString(noteIndicatorType: NoteIndicatorType, height: Dp) {
         )
 
         when (noteIndicatorType) {
-            is NoteIndicatorType.PrimaryFingerPosition -> NoteShapeIndicator(note = noteIndicatorType.fingerNumber)
-            is NoteIndicatorType.PrimaryFingerPositionWithLigature -> NoteShapeIndicator(note = noteIndicatorType.fingerNumber)
-            is NoteIndicatorType.LastFingerPosition -> NoteShapeIndicator(note = noteIndicatorType.fingerNumber)
+            is NoteIndicatorType.PrimaryFingerPosition -> NoteShapeIndicator(note = noteIndicatorType.fingerNumber, backgroundColor = fingerPositionBackgroundColor)
+            is NoteIndicatorType.PrimaryFingerPositionWithLigature -> NoteShapeIndicator(note = noteIndicatorType.fingerNumber, backgroundColor = fingerPositionBackgroundColor)
+            is NoteIndicatorType.LastFingerPosition -> NoteShapeIndicator(note = noteIndicatorType.fingerNumber, backgroundColor = fingerPositionBackgroundColor)
             NoteIndicatorType.Ligature -> BarreLigature()
         }
     }
@@ -299,11 +306,11 @@ private fun BarreLigature() {
 }
 
 @Composable
-private fun NoteShapeIndicator(note: Int) {
+private fun NoteShapeIndicator(note: Int, backgroundColor: Color) {
     Box(
         modifier = Modifier
             .wrapContentSize()
-            .background(color = White, shape = CircleShape)
+            .background(color = backgroundColor, shape = CircleShape)
             .layout { measurable, constraints ->
                 // Measure the composable
                 val placeable = measurable.measure(constraints)
@@ -324,6 +331,7 @@ private fun NoteShapeIndicator(note: Int) {
     ) {
         Text(
             text = note.toString(),
+            color = Color.White,
             modifier = Modifier
                 .padding(1.dp)
         )
