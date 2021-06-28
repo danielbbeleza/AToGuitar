@@ -2,13 +2,11 @@ package com.atoguitar.app.views
 
 import android.content.Context
 import android.util.AttributeSet
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.platform.AbstractComposeView
 import com.atoguitar.app.Chord
 import com.atoguitar.app.ChordFactory
+import com.atoguitar.app.ChordLetter
 
 class GuitarChordDialogView @JvmOverloads constructor(
     context: Context,
@@ -16,11 +14,17 @@ class GuitarChordDialogView @JvmOverloads constructor(
     defStyle: Int = 0
 ) : AbstractComposeView(context, attrs, defStyle) {
 
-    var chord by mutableStateOf<Chord>(ChordFactory.buildChordFromLetter())
+    var chord by mutableStateOf<Chord>(ChordFactory.buildChordFromLetter(ChordLetter.NONE))
 
     @Composable
     override fun Content() {
-//        GuitarChordDialog(chord = chord) {
-//        }
+        val (_, setShowDialog) = remember { mutableStateOf(false) }
+        val (showChordLetterRow, setShowChordLetterRow) = remember { mutableStateOf(true) }
+        GuitarChordDialog(
+            chord = chord,
+            showChordLetter = showChordLetterRow,
+            setShowDialog = setShowDialog,
+            setShowChordLetterRow = setShowChordLetterRow
+        )
     }
 }

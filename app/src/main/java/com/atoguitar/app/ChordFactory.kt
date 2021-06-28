@@ -2,7 +2,7 @@ package com.atoguitar.app
 
 object ChordFactory {
 
-    fun buildChordFromLetter(chordLetter: ChordLetter = ChordLetter.NONE): Chord {
+    fun buildChordFromLetter(chordLetter: ChordLetter): Chord {
         return when (chordLetter) {
             ChordLetter.A_MAJOR -> {
                 buildChord(
@@ -204,7 +204,7 @@ object ChordFactory {
                     FingerPosition(fingerNumber = 3, stringFretPosition = 12)
                 )
             }
-            ChordLetter.NONE -> buildChord(ChordLetter.NONE)
+            else -> throw IllegalStateException("Unknown chord letter. Make sure you are using one of the ChordLetter enum options.")
         }
     }
 
