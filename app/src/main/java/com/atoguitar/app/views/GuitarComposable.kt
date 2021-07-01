@@ -168,7 +168,7 @@ private fun GuitarChordLayout(
 }
 
 private fun getNoteIndicatorType(chord: Chord, stringNote: Int): NoteIndicatorType {
-    lateinit var noteIndicatorType: NoteIndicatorType
+    var noteIndicatorType: NoteIndicatorType = NoteIndicatorType.None
     fingerPositionLoop@ for (fingerPosition in chord.fingerPositions) {
         if (fingerPosition.stringFretLastPosition != null && fingerPosition.stringFretFirstBarrePosition != null) {
             Log.i("GuitarComposable", "Is barre")
