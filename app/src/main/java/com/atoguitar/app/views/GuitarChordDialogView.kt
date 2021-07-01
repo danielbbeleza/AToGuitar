@@ -15,7 +15,7 @@ class GuitarChordDialogView @JvmOverloads constructor(
     defStyle: Int = 0
 ) : AbstractComposeView(context, attrs, defStyle) {
 
-    var chord by mutableStateOf<Chord>(ChordFactory.buildChordFromLetter(ChordLetter.NONE))
+    var chord by mutableStateOf<Chord>(ChordFactory.buildChordFromLetter())
     var fingerPositionBackgroundColor by mutableStateOf<Color>(ColorPrimary)
 
     @Composable
