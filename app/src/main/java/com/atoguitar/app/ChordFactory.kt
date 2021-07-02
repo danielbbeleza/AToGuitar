@@ -1,5 +1,8 @@
 package com.atoguitar.app
 
+import com.atoguitar.app.models.Chord
+import com.atoguitar.app.models.FingerPosition
+
 object ChordFactory {
 
     fun buildChordFromLetter(chordLetter: ChordLetter = ChordLetter.NONE): Chord {

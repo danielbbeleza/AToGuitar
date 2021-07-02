@@ -1,4 +1,4 @@
-package com.atoguitar.app.views
+package com.atoguitar.app.res
 
 import androidx.compose.ui.unit.dp
 

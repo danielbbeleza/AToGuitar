@@ -1,13 +1,4 @@
-package com.atoguitar.app
-
-data class Chord(val chordLetter: ChordLetter, val fingerPositions: List<FingerPosition>)
-
-data class FingerPosition(
-    val fingerNumber: Int,
-    val stringFretPosition: Int,
-    val stringFretFirstBarrePosition: Int? = null,
-    val stringFretLastPosition: Int? = null
-)
+package com.atoguitar.app.models
 
 sealed class NoteIndicatorType {
     data class PrimaryFingerPosition(val fingerNumber: Int) : NoteIndicatorType()

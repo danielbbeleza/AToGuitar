@@ -21,6 +21,10 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.*
 import com.atoguitar.app.*
+import com.atoguitar.app.models.Chord
+import com.atoguitar.app.models.FingerPosition
+import com.atoguitar.app.models.NoteIndicatorType
+import com.atoguitar.app.res.*
 
 @Composable
 fun GuitarChordDialog(

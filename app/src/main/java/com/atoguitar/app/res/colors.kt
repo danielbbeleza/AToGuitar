@@ -1,4 +1,4 @@
-package com.atoguitar.app.views
+package com.atoguitar.app.res
 
 val ColorPrimary = Purple500
 val ColorPrimaryVariant = Purple700
