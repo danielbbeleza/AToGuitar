@@ -6,6 +6,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.AbstractComposeView
+import androidx.core.view.isVisible
 import com.atoguitar.app.models.Chord
 import com.atoguitar.app.R
 import com.atoguitar.app.ChordFactory
@@ -38,12 +39,13 @@ class GuitarChordDialogView @JvmOverloads constructor(
 
     @Composable
     override fun Content() {
-        val (_, setShowDialog) = remember { mutableStateOf(false) }
         val (showChordLetterRow, setShowChordLetterRow) = remember { mutableStateOf(true) }
         GuitarChordDialog(
             chord = chord,
             showChordLetter = showChordLetterRow,
-            setShowDialog = setShowDialog,
+            setShowDialog = {
+                isVisible = it
+            },
             setShowChordLetterRow = setShowChordLetterRow,
             fingerPositionBackgroundColor = fingerPositionBackgroundColor
         )
